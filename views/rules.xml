@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="model_logic_rules_form_view" model="ir.ui.view">
+        <field name="name">Logic Policies</field>
+        <field name="model">logic.rules</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Policies">
+                <header>
+                    <field name="state" widget="statusbar"/>
+                    <button name="action_sent_notification_button" type="object" class="oe_highlight"
+                            string="Sent Notification" states="draft"/>
+                    <button name="action_mark_as_done" style="background-color: #5aa133" type="object" string="Acknowledge"
+                            states="sent"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="rule_type" required="1" attrs="{'readonly': [('state', '=', 'sent')]}"/>
+                            <field name="department_id"
+                                   attrs="{'invisible': [('rule_type', '!=', 'by_department')], 'required': [('rule_type', '=', 'by_department')]}"/>
+                            <field name="employee_id"
+                                   attrs="{'invisible': [('rule_type', '!=', 'by_employee')], 'required': [('rule_type', '=', 'by_employee')]}"/>
+                            <field name="rule" attrs="{'readonly': [('state', '=', 'sent')]}"/>
+
+                        </group>
+                        <field name="files" attrs="{'readonly': [('state', '=', 'sent')]}"
+                               style="width: 50%; height: 20%;"/>
+                    </group>
+                    <notebook groups="logic_rules.policies_hr_manager">
+                        <page string="Acknowledge Employees" name="datas">
+                            <field name="datas_ids">
+                                <tree string="Acknowledge Employees" editable="bottom">
+                                    <field name="employee_id"/>
+                                </tree>
+                            </field>
+
+                        </page>
+                    </notebook>
+
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids" options="{'post_refresh': 'recipients'}"/>
+                </div>
+            </form>
+        </field>
+    </record>
+    <record id="logic_rules_tree_view" model="ir.ui.view">
+        <field name="name">Policies</field>
+        <field name="model">logic.rules</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="rule_type"/>
+                <field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="logic_rules_action">
+        <field name="name">Policies</field>
+        <field name="res_model">logic.rules</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    <menuitem name="Policies"
+              id="logic_rules_main_menu"
+              web_icon="logic_rules/static/description/icon.png"
+              sequence="10"/>
+
+    <menuitem name="Policies" id="menu_logic_rules"
+              action="logic_rules_action"
+              parent="logic_rules_main_menu"
+              sequence="1"/>
+
+
+</odoo>

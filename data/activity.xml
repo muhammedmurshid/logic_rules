@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="activity_for_logic_rules" model="mail.activity.type">
+        <field name="name">Policies</field>
+        <field name="res_model_id" ref="logic_rules.model_logic_rules"/>
+    </record>
+</odoo>

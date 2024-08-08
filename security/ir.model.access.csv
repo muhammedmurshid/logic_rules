@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+
+access_logic_rules,access_logic_rules,model_logic_rules,,1,1,0,0
+access_logic_rules_datas,access_logic_rules,model_acknowledge_employees,,1,1,1,1
+access_logic_rules_hr_manager,access_logic_rules_hr_manager,model_logic_rules,logic_rules.policies_hr_manager,1,1,1,1

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <record id="logic_policies_rule" model="ir.rule">
+            <field name="name">Logic Policies Rule</field>
+            <field name="model_id" ref="model_logic_rules"/>
+            <field name="domain_force">['|','|',('rule_type', '=', 'by_company'), ('employee_id', '=', user.employee_id.id), ('department_id', '=', user.employee_id.department_id.id)]</field>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+        <record id="logic_policies_hr_manager_rule" model="ir.rule">
+            <field name="name">HR Manager Policies Rule</field>
+            <field name="model_id" ref="model_logic_rules"/>
+            <field name="domain_force">[('rule_type', 'in', ['by_company','by_employee','by_department'])]</field>
+            <field name="groups" eval="[(4, ref('logic_rules.policies_hr_manager'))]"/>
+        </record>
+    </data>
+</odoo>
