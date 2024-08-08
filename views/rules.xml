@@ -10,12 +10,14 @@
                     <field name="state" widget="statusbar"/>
                     <button name="action_sent_notification_button" type="object" class="oe_highlight"
                             string="Sent Notification" states="draft"/>
-                    <button name="action_mark_as_done" style="background-color: #5aa133" type="object" string="Acknowledge"
+                    <button name="action_mark_as_done" style="background-color: #5aa133" type="object"
+                            string="Acknowledge"
                             states="sent"/>
                 </header>
                 <sheet>
                     <group>
                         <group>
+                            <field name="date" attrs="{'readonly': [('state', '=', 'sent')]}"/>
                             <field name="rule_type" required="1" attrs="{'readonly': [('state', '=', 'sent')]}"/>
                             <field name="department_id"
                                    attrs="{'invisible': [('rule_type', '!=', 'by_department')], 'required': [('rule_type', '=', 'by_department')]}"/>
@@ -52,6 +54,7 @@
         <field name="model">logic.rules</field>
         <field name="arch" type="xml">
             <tree>
+                <field name="date"/>
                 <field name="rule_type"/>
                 <field name="state" widget="badge"/>
             </tree>

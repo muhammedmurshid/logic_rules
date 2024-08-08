@@ -18,6 +18,7 @@ class LogicRules(models.Model):
                              tracking=1)
     files = fields.Html(string='Files')
     datas_ids = fields.One2many('acknowledge.employees', 'data_id', string='Datas')
+    date = fields.Date(string='Date', default=fields.Date.context_today)
 
     def _compute_display_name(self):
         for i in self:
