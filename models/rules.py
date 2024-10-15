@@ -16,6 +16,7 @@ class LogicRules(models.Model):
     rule = fields.Text(string='Policies')
     state = fields.Selection([('draft', 'Draft'), ('sent', 'Sent')], default='draft',
                              tracking=1)
+
     files = fields.Html(string='Files')
     datas_ids = fields.One2many('acknowledge.employees', 'data_id', string='Datas')
     date = fields.Date(string='Date', default=fields.Date.context_today)
@@ -31,6 +32,21 @@ class LogicRules(models.Model):
                     i.display_name = 'Rules for ' + i.employee_id.name
             else:
                 i.display_name = 'Rules'
+
+    def action_get_attachment_view(self):
+        self.ensure_one()
+        res = self.env['ir.actions.act_window']._for_xml_id('base.action_attachment')
+        res['domain'] = [('res_model', '=', 'logic.rules'), ('res_id', 'in', self.ids)]
+        res['context'] = {'default_res_model': 'logic.rules', 'default_res_id': self.id}
+        return res
+
+    attachment_number = fields.Integer(string='Attachment Number', compute='_compute_attachment_number')
+    def _compute_attachment_number(self):
+        attachment_data = self.env['ir.attachment'].read_group(
+            [('res_model', '=', 'logic.rules'), ('res_id', 'in', self.ids)], ['res_id'], ['res_id'])
+        attachment = dict((data['res_id'], data['res_id_count']) for data in attachment_data)
+        for expense in self:
+            expense.attachment_number = attachment.get(expense.id, 0)
 
     def action_sent_notification_button(self):
         print('hi')

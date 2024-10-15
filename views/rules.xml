@@ -8,13 +8,30 @@
             <form string="Policies">
                 <header>
                     <field name="state" widget="statusbar"/>
+                    <widget name="attach_document" string="Attach Files" action="message_post" states="draft"/>
                     <button name="action_sent_notification_button" type="object" class="oe_highlight"
                             string="Sent Notification" states="draft"/>
                     <button name="action_mark_as_done" style="background-color: #5aa133" type="object"
                             string="Acknowledge"
                             states="sent"/>
+<!--                    <button name="action_get_attachment_view" string="View Attachments" type="object"-->
+<!--                                            icon="fa-paperclip" />-->
                 </header>
                 <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_get_attachment_view"
+                                class="oe_stat_button"
+                                icon="fa-file-text-o"
+                                type="object">
+                            <field name="attachment_number" widget="statinfo" string="Files"
+                                   options="{'reload_on_button': true}"/>
+                        </button>
+
+
+                            <!--                            <field name="attachment_number" widget="statinfo" string="Receipts"-->
+                            <!--                                   options="{'reload_on_button': true}"/>-->
+
+                    </div>
                     <group>
                         <group>
                             <field name="date" attrs="{'readonly': [('state', '=', 'sent')]}"/>
@@ -26,8 +43,8 @@
                             <field name="rule" attrs="{'readonly': [('state', '=', 'sent')]}"/>
 
                         </group>
-                        <field name="files" attrs="{'readonly': [('state', '=', 'sent')]}"
-                               style="width: 50%; height: 20%;"/>
+<!--                        <field name="files" attrs="{'readonly': [('state', '=', 'sent')]}"-->
+<!--                               style="width: 50%; height: 20%;"/>-->
                     </group>
                     <notebook groups="logic_rules.policies_hr_manager">
                         <page string="Acknowledge Employees" name="datas">
