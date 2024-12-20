@@ -20,6 +20,7 @@ class LogicRules(models.Model):
     files = fields.Html(string='Files')
     datas_ids = fields.One2many('acknowledge.employees', 'data_id', string='Datas')
     date = fields.Date(string='Date', default=fields.Date.context_today)
+    self_declaration_form = fields.Boolean(string="Self Declaration Form")
 
     def _compute_display_name(self):
         for i in self:
@@ -69,10 +70,6 @@ class LogicRules(models.Model):
 
     def action_mark_as_done(self):
         print('kkk')
-        # self.state = 'acknowledge'
-        activity_id = self.env['mail.activity'].search([('res_id', '=', self.id), ('user_id', '=', self.env.user.id), (
-            'activity_type_id', '=', self.env.ref('logic_rules.activity_for_logic_rules').id)])
-        activity_id.action_feedback(feedback='Acknowledge')
         datas = []
         for record in self:
             employee_ids = record.datas_ids.mapped('employee_id')
@@ -86,15 +83,44 @@ class LogicRules(models.Model):
             )
         else:
             self.datas_ids = [(0, 0, {
-                'employee_id': self.env.user.employee_id.id
+                'employee_id': self.env.user.employee_id.id,
+                'acknowledge_date': fields.Datetime.now(),
+                'designation': self.env.user.employee_id.job_title
             })]
-            return {
-                'effect': {
-                    'fadeout': 'slow',
-                    'message': 'Policies Acknowledge.',
-                    'type': 'rainbow_man',
-                }
-            }
+        # if self.self_declaration_form == True:
+        #     print('hi')
+        #     return {'name': _('Self Declaration Form'),
+        #             'type': 'ir.actions.act_window',
+        #             'res_model': 'self.declaration.form',
+        #             'view_mode': 'form',
+        #             'target': 'new'}
+        # else:
+        #     # self.state = 'acknowledge'
+        #     activity_id = self.env['mail.activity'].search([('res_id', '=', self.id), ('user_id', '=', self.env.user.id), (
+        #         'activity_type_id', '=', self.env.ref('logic_rules.activity_for_logic_rules').id)])
+        #     activity_id.action_feedback(feedback='Acknowledge')
+        #     datas = []
+        #     for record in self:
+        #         employee_ids = record.datas_ids.mapped('employee_id')
+        #         print(employee_ids, 'emp')
+        #         for j in employee_ids:
+        #             datas.append(j.id)
+        #     print(datas, 'da')
+        #     if self.env.user.employee_id.id in datas:
+        #         raise UserError(
+        #             _("You have already acknowledged this policy.")
+        #         )
+        #     else:
+        #         self.datas_ids = [(0, 0, {
+        #             'employee_id': self.env.user.employee_id.id
+        #         })]
+        #         return {
+        #             'effect': {
+        #                 'fadeout': 'slow',
+        #                 'message': 'Policies Acknowledge.',
+        #                 'type': 'rainbow_man',
+        #             }
+        #         }
 
     @api.onchange('rule_type')
     def _onchange_rule_type(self):
@@ -108,3 +134,27 @@ class LogicRules(models.Model):
                 elif i.rule_type == 'by_department':
                     i.employee_id = False
 
+
+class SelfDeclarationForm(models.TransientModel):
+    _name = 'self.declaration.form'
+
+    employee_id = fields.Many2one('hr.employee', string="Employee", required=True, default=lambda self: self.env.user.employee_id)
+    employee_code = fields.Char(string="Employee Code", required=True)
+    date = fields.Date(string="Date", default=fields.Date.today, required=True)
+    signature = fields.Binary(string='Signature', required=True)
+
+    policy_acknowledgement = fields.Text(
+        string='Acknowledgement',
+        default="I have read and understood the mentioned HR policies and will abide by all the rules and regulations.",
+        readonly=True,
+    )
+
+    def print_sample_report(self):
+        data = {
+            'model_id': self.id,
+            'employee_id':self.employee_id.name
+        }
+        # docids = self.env['purchase.order'].search([]).ids
+        return self.env.ref(
+            'logic_rules.action_self_declaration_form').report_action(self)
+        # return self.env.ref('logic_rules.action_self_declaration_form').report_action(None, data=data)

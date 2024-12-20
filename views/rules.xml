@@ -14,8 +14,8 @@
                     <button name="action_mark_as_done" style="background-color: #5aa133" type="object"
                             string="Acknowledge"
                             states="sent"/>
-<!--                    <button name="action_get_attachment_view" string="View Attachments" type="object"-->
-<!--                                            icon="fa-paperclip" />-->
+                    <!--                    <button name="action_get_attachment_view" string="View Attachments" type="object"-->
+                    <!--                                            icon="fa-paperclip" />-->
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
@@ -28,8 +28,8 @@
                         </button>
 
 
-                            <!--                            <field name="attachment_number" widget="statinfo" string="Receipts"-->
-                            <!--                                   options="{'reload_on_button': true}"/>-->
+                        <!--                            <field name="attachment_number" widget="statinfo" string="Receipts"-->
+                        <!--                                   options="{'reload_on_button': true}"/>-->
 
                     </div>
                     <group>
@@ -43,14 +43,20 @@
                             <field name="rule" attrs="{'readonly': [('state', '=', 'sent')]}"/>
 
                         </group>
-<!--                        <field name="files" attrs="{'readonly': [('state', '=', 'sent')]}"-->
-<!--                               style="width: 50%; height: 20%;"/>-->
+                        <group>
+                            <field name="self_declaration_form"/>
+                        </group>
+                        <!--                        <field name="files" attrs="{'readonly': [('state', '=', 'sent')]}"-->
+                        <!--                               style="width: 50%; height: 20%;"/>-->
                     </group>
                     <notebook groups="logic_rules.policies_hr_manager">
                         <page string="Acknowledge Employees" name="datas">
                             <field name="datas_ids">
                                 <tree string="Acknowledge Employees" editable="bottom">
                                     <field name="employee_id"/>
+                                    <field name="designation"/>
+                                    <field name="acknowledge_date"/>
+<!--                                    <field name="self_declaration" widget="binary"/>-->
                                 </tree>
                             </field>
 
@@ -83,6 +89,63 @@
         <field name="res_model">logic.rules</field>
         <field name="view_mode">tree,form</field>
     </record>
+
+
+    <record id="self_declaration_form_view" model="ir.ui.view">
+        <field name="name">Declaration Form</field>
+        <field name="model">self.declaration.form</field>
+        <field name="arch" type="xml">
+            <form string="Test">
+                <group>
+                    <group>
+                        <field name="employee_id"/>
+                        <field name="employee_code"/>
+                        <field name="date"/>
+                        <field name="signature" widget="image"/>
+                    </group>
+                    <group>
+                        <field name="policy_acknowledgement" nolabel="1"/>
+                    </group>
+                    <footer>
+                        <button name="print_sample_report" type="object" string="Print"/>
+                    </footer>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="self_declaration_action" model="ir.actions.act_window">
+        <field name="name">Declaration Form</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">self.declaration.form</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="self_declaration_form_view"/>
+        <field name="target">new</field>
+    </record>
+
+    <record id="action_self_declaration_form" model="ir.actions.report">
+        <field name="name">Self Declaration</field>
+        <field name="model">self.declaration.form</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">logic_rules.report_self_declaration_form</field>
+        <field name="report_file">logic_rules.report_self_declaration_form</field>
+        <field name="print_report_name">'Self Declaration - %s')</field>
+        <field name="binding_model_id" ref="model_self_declaration_form"/>
+        <field name="binding_type">report</field>
+    </record>
+    <template id="report_self_declaration_form">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Sample Report</h2>
+                        <p>span t-field="o.employee_id"/></p>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
     <menuitem name="Policies"
               id="logic_rules_main_menu"
               web_icon="logic_rules/static/description/icon.png"
